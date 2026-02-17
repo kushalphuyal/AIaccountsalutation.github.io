@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smart Accounts Nepal</title>
+
+<style>
+body{font-family:Arial;margin:0;background:#f4f6f9;}
+nav{background:#2d6cdf;color:white;padding:15px;font-size:18px;}
+.container{padding:20px;max-width:700px;margin:auto;}
+.card{background:white;padding:20px;margin-top:15px;border-radius:10px;}
+input,select,button,textarea{width:100%;padding:10px;margin-top:10px;}
+button{background:#2d6cdf;color:white;border:none;}
+</style>
+</head>
+
+<body>
+
+<nav>Smart Accounts Nepal</nav>
+
+<div class="container">
+
+<div class="card">
+<h3>VAT Calculator</h3>
+<input id="vatAmt" placeholder="Amount">
+<select id="vatType">
+<option value="exclusive">Exclusive</option>
+<option value="inclusive">Inclusive</option>
+</select>
+<button onclick="calcVAT()">Calculate VAT</button>
+<div id="vatResult"></div>
+</div>
+
+<div class="card">
+<h3>Ask Accounting AI</h3>
+<textarea id="aiQ" placeholder="Ask anything about tax/accounting"></textarea>
+<button onclick="askAI()">Ask AI</button>
+<div id="aiResult"></div>
+</div>
+
+</div>
+
+<script>
+function calcVAT(){
+let amt=parseFloat(document.getElementById("vatAmt").value);
+let type=document.getElementById("vatType").value;
+
+let base,vat,total;
+
+if(type==="exclusive"){
+vat=amt*0.13;
+base=amt;
+total=amt+vat;
+}else{
+base=amt/1.13;
+vat=amt-base;
+total=amt;
+}
+
+document.getElementById("vatResult").innerHTML=
+`Base: ${base.toFixed(2)} | VAT: ${vat.toFixed(2)} | Total: ${total.toFixed(2)}`;
+}
+
+async function askAI(){
+
+const question=document.getElementById("aiQ").value;
+
+const res=await fetch("https://openrouter.ai/api/v1/chat/completions",{
+method:"POST",
+headers:{
+"Authorization":"Bearer YOUR_API_KEY",
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+model:"mistralai/mistral-7b-instruct",
+messages:[{role:"user",content:question}]
+})
+});
+
+const data=await res.json();
+document.getElementById("aiResult").innerHTML=data.choices[0].message.content;
+}
+</script>
+
+</body>
+</html>
