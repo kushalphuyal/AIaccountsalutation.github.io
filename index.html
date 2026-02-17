@@ -3,92 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nepal Accounting AI - Final</title>
+    <title>Nepal Accounting AI - Final Fixed</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        :root { --primary: #003893; --secondary: #dc143c; --bg: #fdfdfd; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; }
-        .header { background: var(--primary); color: white; padding: 25px; text-align: center; border-bottom: 5px solid var(--secondary); }
-        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
-        .card { background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 25px; position: relative; overflow: hidden; }
-        .card::before { content: ""; position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: var(--secondary); }
-        h3 { color: var(--primary); margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        textarea, input, select { width: 100%; padding: 15px; margin-top: 12px; border: 2px solid #edf2f7; border-radius: 10px; font-size: 1rem; transition: 0.3s; box-sizing: border-box; }
-        textarea:focus { border-color: var(--primary); outline: none; }
-        button { background: var(--primary); color: white; border: none; padding: 15px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 20px; font-size: 1.1rem; }
-        button:hover { opacity: 0.9; transform: translateY(-2px); }
-        button:disabled { background: #cbd5e0; cursor: not-allowed; }
-        #aiResult { margin-top: 25px; padding: 20px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0; min-height: 100px; color: #2d3748; line-height: 1.7; }
-        /* Table Styling for AI Response */
-        table { width: 100%; border-collapse: collapse; margin: 15px 0; background: white; }
-        th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: left; }
-        th { background: #edf2f7; color: var(--primary); }
-        .badge { background: #e2e8f0; padding: 4px 10px; border-radius: 5px; font-size: 0.8rem; font-weight: bold; color: var(--primary); }
+        :root { --primary: #003893; --secondary: #dc143c; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); border-top: 8px solid var(--primary); }
+        h2 { color: var(--primary); text-align: center; margin-bottom: 25px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        textarea { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; resize: vertical; }
+        button { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 18px; cursor: pointer; margin-top: 15px; transition: 0.3s; }
+        button:hover { background: #002a6d; }
+        button:disabled { background: #ccc; }
+        #aiResult { margin-top: 25px; padding: 20px; background: #fafafa; border: 1px solid #eee; border-radius: 10px; min-height: 50px; line-height: 1.6; overflow-x: auto; }
+        /* Table Style for Journal Entries */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #f2f2f2; color: var(--primary); }
+        .loading-spinner { color: #dc143c; font-weight: bold; text-align: center; display: block; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>🇳🇵 Nepal Accounting AI Expert</h1>
-    <p>Journal Entries • TDS & VAT • Income Tax Act 2058</p>
-</div>
-
 <div class="container">
-    <div class="card">
-        <h3>🔢 Quick VAT & TDS Estimator</h3>
-        <input type="number" id="baseAmt" placeholder="Enter Base Amount (NPR)">
-        <div style="display: flex; gap: 10px; margin-top: 10px;">
-            <select id="calcTdsRate">
-                <option value="0">No TDS</option>
-                <option value="1.5">1.5% (VAT Registered Service)</option>
-                <option value="10">10% (Rent / Interest)</option>
-                <option value="15">15% (Consultancy / Non-VAT)</option>
-            </select>
-            <select id="addVat">
-                <option value="yes">Add 13% VAT</option>
-                <option value="no">No VAT</option>
-            </select>
-        </div>
-        <button onclick="quickCalc()">Estimate Now</button>
-        <div id="calcResult" style="margin-top: 15px; font-size: 0.95rem;"></div>
-    </div>
-
-    <div class="card">
-        <h3>🧾 AI Journal & Tax Law Advisor</h3>
-        <p>Type your business transaction or tax query below:</p>
-        <textarea id="aiQ" rows="4" placeholder="Ex: Purchased a laptop for Rs 80,000 from a VAT vendor and paid 1.5% TDS..."></textarea>
-        <button id="askBtn" onclick="askAI()">Generate Journal Entry</button>
-        <div id="aiResult">AI response will appear here in table format...</div>
-    </div>
+    <h2>🇳🇵 Nepal Tax & Journal Expert</h2>
+    <p style="color: #666; font-size: 14px;">Transaction lekhnus (English ya Nepali ma):</p>
+    <textarea id="aiQ" rows="5" placeholder="Example: Purchased furniture for 50,000 including 13% VAT. Show journal entry with 1.5% TDS."></textarea>
+    <button id="askBtn" onclick="askAI()">Generate Journal Entry</button>
+    
+    <div id="aiResult">Results will be displayed here...</div>
 </div>
 
 <script>
-function quickCalc() {
-    let amt = parseFloat(document.getElementById('baseAmt').value);
-    let tdsRate = parseFloat(document.getElementById('calcTdsRate').value);
-    let vatNeeded = document.getElementById('addVat').value;
-
-    if(isNaN(amt)) return alert("Please enter amount");
-
-    let vat = (vatNeeded === "yes") ? amt * 0.13 : 0;
-    let tds = amt * (tdsRate / 100);
-    let netPay = amt + vat - tds;
-
-    document.getElementById('calcResult').innerHTML = `
-        <div style="background:#fff9f9; padding:10px; border-radius:8px; border:1px dashed var(--secondary);">
-            <b>Base:</b> Rs. ${amt.toLocaleString()} | <b>VAT:</b> Rs. ${vat.toLocaleString()}<br>
-            <b>TDS (${tdsRate}%):</b> Rs. ${tds.toLocaleString()} | <b>Net Payable:</b> <span style="color:green">Rs. ${netPay.toLocaleString()}</span>
-        </div>
-    `;
-}
-
 async function askAI(){
     const question = document.getElementById('aiQ').value;
     const resultDiv = document.getElementById('aiResult');
     const btn = document.getElementById('askBtn');
 
-    if(!question) return alert("Hajurle kehi sodhnubhayeko chhaina!");
+    if(!question) return alert("Please type your question!");
 
-    resultDiv.innerHTML = "<b style='color:#e67e22'>🔄 Thinking (Nepal Tax Law 2082/83)...</b>";
+    resultDiv.innerHTML = "<span class='loading-spinner'>🔄 Analyzing Nepal Tax Law & Generating Table...</span>";
     btn.disabled = true;
 
     try {
@@ -103,7 +56,7 @@ async function askAI(){
                 "messages": [
                     {
                         "role": "system",
-                        "content": "You are an expert Chartered Accountant of Nepal. Answer in Roman Nepali + English. For business transactions, ALWAYS provide a Journal Entry in a Markdown Table (Date, Particulars, L.F., Debit Rs., Credit Rs.). Use Nepal's Income Tax Act 2058 and VAT Act 2052. Current TDS: 1.5% for VAT service, 15% for non-VAT service, 10% for Rent. Be professional."
+                        "content": "You are a Nepal Tax Expert CA. Provide Journal Entries in a Markdown table (Date, Particulars, Debit Rs., Credit Rs.). Use Nepal Income Tax Act 2058. Explain TDS (1.5% or 15%) and VAT (13%) logic clearly in simple Roman Nepali."
                     },
                     { "role": "user", "content": question }
                 ]
@@ -111,21 +64,20 @@ async function askAI(){
         });
 
         const data = await response.json();
-        const content = data.choices[0].message.content;
         
-        // Simple Markdown Table to HTML converter logic for display
-        resultDiv.innerHTML = formatAIResponse(content);
-
+        if (data.choices && data.choices[0]) {
+            const markdownText = data.choices[0].message.content;
+            // 'marked.parse' le AI le pathayeko markdown table lai real HTML table ma badalcha
+            resultDiv.innerHTML = marked.parse(markdownText);
+        } else {
+            resultDiv.innerHTML = "❌ Error: API key issue or server busy. Please check your OpenRouter dashboard.";
+        }
     } catch (error) {
-        resultDiv.innerHTML = "❌ Error: API Key expired or Connection lost.";
+        resultDiv.innerHTML = "❌ Connection Error: Please check your internet or browser console.";
+        console.error(error);
     } finally {
         btn.disabled = false;
     }
-}
-
-function formatAIResponse(text) {
-    // Basic formatting for the demo
-    return text.replace(/\n/g, "<br>").replace(/\|/g, "│");
 }
 </script>
 
