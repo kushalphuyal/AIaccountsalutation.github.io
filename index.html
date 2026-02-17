@@ -1,87 +1,110 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI account salutation with kushal </title>
-
-<style>
-body{font-family:Arial;margin:0;background:#f4f6f9;}
-nav{background:#2d6cdf;color:white;padding:15px;font-size:18px;}
-.container{padding:20px;max-width:700px;margin:auto;}
-.card{background:white;padding:20px;margin-top:15px;border-radius:10px;}
-input,select,button,textarea{width:100%;padding:10px;margin-top:10px;}
-button{background:#2d6cdf;color:white;border:none;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nepal Tax AI Assistant</title>
+    <style>
+        :root { --primary: #2d6cdf; --bg: #f0f2f5; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: var(--bg); }
+        nav { background: var(--primary); color: white; padding: 1rem; text-align: center; font-weight: bold; font-size: 1.2rem; }
+        .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        input, select, textarea, button { width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #1e4ea1; }
+        #aiResult { margin-top: 15px; padding: 15px; background: #f9f9f9; border-left: 4px solid var(--primary); white-space: pre-wrap; line-height: 1.5; }
+        .loading { color: orange; font-style: italic; }
+    </style>
 </head>
-
 <body>
 
-<nav>AI account salutation with kushal</nav>
+<nav>🇳🇵 Nepal Tax & Accounting AI</nav>
 
 <div class="container">
+    <div class="card">
+        <h3>📊 Quick VAT Calculator (13%)</h3>
+        <input type="number" id="vatAmt" placeholder="Enter Amount (NPR)">
+        <select id="vatType">
+            <option value="exclusive">VAT Exclusive (Add 13%)</option>
+            <option value="inclusive">VAT Inclusive (Extract 13%)</option>
+        </select>
+        <button onclick="calcVAT()">Calculate</button>
+        <div id="vatResult" style="margin-top:10px; font-weight:bold;"></div>
+    </div>
 
-<div class="card">
-<h3>VAT Calculator</h3>
-<input id="vatAmt" placeholder="Amount">
-<select id="vatType">
-<option value="exclusive">Exclusive</option>
-<option value="inclusive">Inclusive</option>
-</select>
-<button onclick="calcVAT()">Calculate VAT</button>
-<div id="vatResult"></div>
-</div>
-
-<div class="card">
-<h3>Ask Accounting AI</h3>
-<textarea id="aiQ" placeholder="Ask anything about tax/accounting"></textarea>
-<button onclick="askAI()">Ask AI</button>
-<div id="aiResult"></div>
-</div>
-
+    <div class="card">
+        <h3>💬 Ask Nepal Tax Expert</h3>
+        <p style="font-size: 0.8rem; color: #666;">Ask about TDS rates, Salary Tax, or VAT returns.</p>
+        <textarea id="aiQ" rows="4" placeholder="Example: 15% TDS kata katne? or What is the tax slab for FY 2080/81?"></textarea>
+        <button id="askBtn" onclick="askAI()">Ask AI Assistant</button>
+        <div id="aiResult">Answers will appear here...</div>
+    </div>
 </div>
 
 <script>
+// Logic for VAT
 function calcVAT(){
-let amt=parseFloat(document.getElementById("vatAmt").value);
-let type=document.getElementById("vatType").value;
+    let amt = parseFloat(document.getElementById('vatAmt').value);
+    let type = document.getElementById('vatType').value;
+    if(isNaN(amt)) return alert("Please enter a valid number");
 
-let base,vat,total;
-
-if(type==="exclusive"){
-vat=amt*0.13;
-base=amt;
-total=amt+vat;
-}else{
-base=amt/1.13;
-vat=amt-base;
-total=amt;
+    let base, vat, total;
+    if(type === "exclusive"){
+        vat = amt * 0.13;
+        base = amt;
+        total = amt + vat;
+    } else {
+        base = amt / 1.13;
+        vat = amt - base;
+        total = amt;
+    }
+    document.getElementById('vatResult').innerHTML = `
+        Base: Rs. ${base.toLocaleString(undefined, {minimumFractionDigits: 2})} <br>
+        VAT (13%): Rs. ${vat.toLocaleString(undefined, {minimumFractionDigits: 2})} <br>
+        Total: Rs. ${total.toLocaleString(undefined, {minimumFractionDigits: 2})}
+    `;
 }
 
-document.getElementById("vatResult").innerHTML=
-`Base: ${base.toFixed(2)} | VAT: ${vat.toFixed(2)} | Total: ${total.toFixed(2)}`;
-}
-
+// Logic for AI
 async function askAI(){
+    const question = document.getElementById('aiQ').value;
+    const resultDiv = document.getElementById('aiResult');
+    const btn = document.getElementById('askBtn');
 
-const question=document.getElementById("aiQ").value;
+    if(!question) return alert("Please ask a question!");
 
-const res=await fetch("https://openrouter.ai/api/v1/chat/completions",{
-method:"POST",
-headers:{
-"Authorization":"Bearer YOUR_API_KEY",
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-model:"mistralai/mistral-7b-instruct",
-messages:[{role:"user",content:question}]
-})
-});
+    resultDiv.innerHTML = "<span class='loading'>Analyzing Nepal Tax Laws...</span>";
+    btn.disabled = true;
 
-const data=await res.json();
-document.getElementById("aiResult").innerHTML=data.choices[0].message.content;
+    try {
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer YOUR_OPENROUTER_API_KEY", // Replace with your key
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "model": "google/gemini-2.0-flash-exp:free", // Using a better free model
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You are an expert Chartered Accountant (CA) of Nepal. You provide advice based on the Nepal Income Tax Act 2058, VAT Act 2052, and current Finance Acts. Always mention that your advice is for informational purposes. Answer in a professional manner, using Nepali or English as requested."
+                    },
+                    {"role": "user", "content": question}
+                ]
+            })
+        });
+
+        const data = await response.json();
+        resultDiv.innerHTML = data.choices[0].message.content;
+    } catch (error) {
+        resultDiv.innerHTML = "Error: API key invalid or Network issue.";
+    } finally {
+        btn.disabled = false;
+    }
 }
 </script>
 
 </body>
 </html>
-
