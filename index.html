@@ -127,7 +127,7 @@ async function askAI(){
         return;
     }
 
-    const question = document.getElementById('aiQ').value;
+    const question = document.getElementById('aiQ').value.trim();
     const resultDiv = document.getElementById('aiResult');
     const btn = document.getElementById('askBtn');
 
@@ -141,35 +141,48 @@ async function askAI(){
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": "Bearer " + storedKey,
+                "Authorization": `Bearer ${storedKey}`,
                 "HTTP-Referer": window.location.origin,
                 "X-Title": "Nepal Accounting AI"
             },
             body: JSON.stringify({
-              "model": "openrouter/free",
+                "model": "stepfun/step-3.5-flash:free",
                 "messages": [
                     {
                         "role": "system",
-                        "content": "You are a professional Chartered Accountant of Nepal. Answer in Roman Nepali and English. Use Journal Tables (Date, Particulars, L.F., Debit Rs., Credit Rs.). Apply Nepal's Income Tax Act 2058 and VAT Act 2052. TDS rules: 1.5% for VAT service, 15% for non-VAT, 10% for rent."
+                        "content": "You are a professional Chartered Accountant of Nepal. Answer in Roman Nepali and English. Use clean markdown Journal Tables with columns: Date | Particulars | L.F. | Debit Rs. | Credit Rs. Apply Nepal's Income Tax Act 2058 (updated), VAT Act 2052 (updated), and current TDS rules: 1.5% on VAT-registered service payments, 15% on non-VAT payments, 10% on rent, etc. Be precise, show calculations when needed."
                     },
-                    { "role": "user", "content": question }
-                ]
+                    { 
+                        "role": "user", 
+                        "content": question 
+                    }
+                ],
+                "temperature": 0.3,
+                "max_tokens": 2000
             })
         });
 
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
         const data = await response.json();
         
-        if (data.choices && data.choices[0]) {
+        if (data.choices && data.choices[0] && data.choices[0].message?.content) {
             const markdownText = data.choices[0].message.content;
             resultDiv.innerHTML = marked.parse(markdownText);
         } else if (data.error) {
-            resultDiv.innerHTML = "❌ AI Error: " + data.error.message;
-            if(data.error.code === 401) localStorage.removeItem('nepal_tax_ai_key');
+            resultDiv.innerHTML = `❌ AI Error: ${data.error.message || 'Unknown error'}`;
+            if(data.error.code === 401 || data.error.code === 403) {
+                localStorage.removeItem('nepal_tax_ai_key');
+                alert("API Key invalid bhayo. Naya key halnus.");
+            }
         } else {
-            resultDiv.innerHTML = "❌ Unexpected Error. Please try again.";
+            resultDiv.innerHTML = "❌ Unexpected response format. Please try again.";
         }
     } catch (error) {
-        resultDiv.innerHTML = "❌ Connection Error: " + error.message;
+        resultDiv.innerHTML = `❌ Connection / API Error: ${error.message}`;
+        console.error(error);
     } finally {
         btn.disabled = false;
     }
