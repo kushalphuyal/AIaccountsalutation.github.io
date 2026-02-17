@@ -69,7 +69,55 @@ function calcVAT(){
 }
 
 // AI Logic with FIXED Authorization
-async function askAI(){
+async function askAI( async function askAI(){
+    const question = document.getElementById('aiQ').value;
+    const resultDiv = document.getElementById('aiResult');
+    const btn = document.getElementById('askBtn');
+
+    if(!question) return alert("Hajurle kehi sodhnubhayeko chhaina!");
+
+    resultDiv.innerHTML = "<p class='loading'>🔄 Analyzing per Nepal Tax Law (2082/83)...</p>";
+    btn.disabled = true;
+
+    try {
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                // "Bearer" pachi Space ekdam jaruri chha
+                "Authorization": "Bearer sk-or-v1-YOUR_NEW_KEY_HERE", 
+                "HTTP-Referer": window.location.origin,
+                "X-Title": "Nepal Accounting Bot"
+            },
+            body: JSON.stringify({
+                "model": "google/gemini-2.0-flash-lite-preview-02-05:free",
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You are a Nepal Tax Expert CA. Provide Journal Entries in a Markdown table. Use Nepal Income Tax Act 2058. Answer in Roman Nepali."
+                    },
+                    { "role": "user", "content": question }
+                ]
+            })
+        });
+
+        const data = await response.json();
+        
+        // Error check garne logic
+        if (data.error) {
+            resultDiv.innerHTML = "❌ AI Error: " + data.error.message;
+        } else if (data.choices && data.choices[0]) {
+            const markdownText = data.choices[0].message.content;
+            resultDiv.innerHTML = marked.parse(markdownText);
+        } else {
+            resultDiv.innerHTML = "❌ Unexpected response from AI.";
+        }
+    } catch (error) {
+        resultDiv.innerHTML = "❌ Connection Error: " + error.message;
+    } finally {
+        btn.disabled = false;
+    }
+}){
     const question = document.getElementById('aiQ').value;
     const resultDiv = document.getElementById('aiResult');
     const btn = document.getElementById('askBtn');
