@@ -3,124 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nepal Tax & Accounting AI</title>
+    <title>Nepal Accounting AI - Final</title>
     <style>
-        :root { --primary: #2d6cdf; --bg: #f0f2f5; --accent: #e74c3c; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: var(--bg); color: #333; }
-        nav { background: var(--primary); color: white; padding: 1.2rem; text-align: center; font-weight: bold; font-size: 1.4rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .container { max-width: 850px; margin: 20px auto; padding: 0 15px; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; border-top: 5px solid var(--primary); }
-        h3 { margin-top: 0; color: var(--primary); display: flex; align-items: center; gap: 10px; }
-        input, select, textarea, button { width: 100%; padding: 14px; margin-top: 12px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 1rem; }
-        button { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 20px; }
-        button:hover { background: #1e4ea1; transform: translateY(-2px); }
-        #aiResult { margin-top: 20px; padding: 20px; background: #fff; border: 1px solid #eee; border-left: 5px solid var(--accent); border-radius: 8px; white-space: pre-wrap; line-height: 1.6; font-size: 0.95rem; }
-        .loading { color: #f39c12; font-weight: bold; animation: blink 1s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        .helper-text { font-size: 0.85rem; color: #666; margin-bottom: 10px; }
+        :root { --primary: #003893; --secondary: #dc143c; --bg: #fdfdfd; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; }
+        .header { background: var(--primary); color: white; padding: 25px; text-align: center; border-bottom: 5px solid var(--secondary); }
+        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+        .card { background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 25px; position: relative; overflow: hidden; }
+        .card::before { content: ""; position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: var(--secondary); }
+        h3 { color: var(--primary); margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        textarea, input, select { width: 100%; padding: 15px; margin-top: 12px; border: 2px solid #edf2f7; border-radius: 10px; font-size: 1rem; transition: 0.3s; box-sizing: border-box; }
+        textarea:focus { border-color: var(--primary); outline: none; }
+        button { background: var(--primary); color: white; border: none; padding: 15px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 20px; font-size: 1.1rem; }
+        button:hover { opacity: 0.9; transform: translateY(-2px); }
+        button:disabled { background: #cbd5e0; cursor: not-allowed; }
+        #aiResult { margin-top: 25px; padding: 20px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0; min-height: 100px; color: #2d3748; line-height: 1.7; }
+        /* Table Styling for AI Response */
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; background: white; }
+        th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: left; }
+        th { background: #edf2f7; color: var(--primary); }
+        .badge { background: #e2e8f0; padding: 4px 10px; border-radius: 5px; font-size: 0.8rem; font-weight: bold; color: var(--primary); }
     </style>
 </head>
 <body>
 
-<nav>🇳🇵 Nepal Tax & Accounting AI Assistant</nav>
+<div class="header">
+    <h1>🇳🇵 Nepal Accounting AI Expert</h1>
+    <p>Journal Entries • TDS & VAT • Income Tax Act 2058</p>
+</div>
 
 <div class="container">
     <div class="card">
-        <h3>📊 Quick VAT Calculator</h3>
-        <p class="helper-text">Calculate 13% VAT for Nepal.</p>
-        <input type="number" id="vatAmt" placeholder="Enter Amount (NPR)">
-        <select id="vatType">
-            <option value="exclusive">VAT Exclusive (Add 13%)</option>
-            <option value="inclusive">VAT Inclusive (Extract 13%)</option>
-        </select>
-        <button onclick="calcVAT()">Calculate Figures</button>
-        <div id="vatResult" style="margin-top:15px; font-weight:bold; font-size: 1.1rem; color: #2c3e50;"></div>
+        <h3>🔢 Quick VAT & TDS Estimator</h3>
+        <input type="number" id="baseAmt" placeholder="Enter Base Amount (NPR)">
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <select id="calcTdsRate">
+                <option value="0">No TDS</option>
+                <option value="1.5">1.5% (VAT Registered Service)</option>
+                <option value="10">10% (Rent / Interest)</option>
+                <option value="15">15% (Consultancy / Non-VAT)</option>
+            </select>
+            <select id="addVat">
+                <option value="yes">Add 13% VAT</option>
+                <option value="no">No VAT</option>
+            </select>
+        </div>
+        <button onclick="quickCalc()">Estimate Now</button>
+        <div id="calcResult" style="margin-top: 15px; font-size: 0.95rem;"></div>
     </div>
 
     <div class="card">
-        <h3>📝 Journal Entry & Tax Expert</h3>
-        <p class="helper-text">Example: "Purchased laptop for 1 lakh from VAT shop" or "Rent payment 50k to individual"</p>
-        <textarea id="aiQ" rows="5" placeholder="Write your accounting question or transaction here..."></textarea>
-        <button id="askBtn" onclick="askAI()">Generate Entry / Get Advice</button>
-        <div id="aiResult">AI response will appear here with Journal Entries and Nepal Law references...</div>
+        <h3>🧾 AI Journal & Tax Law Advisor</h3>
+        <p>Type your business transaction or tax query below:</p>
+        <textarea id="aiQ" rows="4" placeholder="Ex: Purchased a laptop for Rs 80,000 from a VAT vendor and paid 1.5% TDS..."></textarea>
+        <button id="askBtn" onclick="askAI()">Generate Journal Entry</button>
+        <div id="aiResult">AI response will appear here in table format...</div>
     </div>
 </div>
 
 <script>
-// Logic for VAT Calculation
-function calcVAT(){
-    let amt = parseFloat(document.getElementById('vatAmt').value);
-    let type = document.getElementById('vatType').value;
-    if(isNaN(amt)) return alert("Please enter a valid amount");
+function quickCalc() {
+    let amt = parseFloat(document.getElementById('baseAmt').value);
+    let tdsRate = parseFloat(document.getElementById('calcTdsRate').value);
+    let vatNeeded = document.getElementById('addVat').value;
 
-    let base, vat, total;
-    if(type === "exclusive"){
-        vat = amt * 0.13;
-        base = amt;
-        total = amt + vat;
-    } else {
-        base = amt / 1.13;
-        vat = amt - base;
-        total = amt;
-    }
-    document.getElementById('vatResult').innerHTML = `
-        Base Amount: Rs. ${base.toLocaleString(undefined, {minimumFractionDigits: 2})} <br>
-        VAT (13%): Rs. ${vat.toLocaleString(undefined, {minimumFractionDigits: 2})} <br>
-        Total Amount: Rs. ${total.toLocaleString(undefined, {minimumFractionDigits: 2})}
+    if(isNaN(amt)) return alert("Please enter amount");
+
+    let vat = (vatNeeded === "yes") ? amt * 0.13 : 0;
+    let tds = amt * (tdsRate / 100);
+    let netPay = amt + vat - tds;
+
+    document.getElementById('calcResult').innerHTML = `
+        <div style="background:#fff9f9; padding:10px; border-radius:8px; border:1px dashed var(--secondary);">
+            <b>Base:</b> Rs. ${amt.toLocaleString()} | <b>VAT:</b> Rs. ${vat.toLocaleString()}<br>
+            <b>TDS (${tdsRate}%):</b> Rs. ${tds.toLocaleString()} | <b>Net Payable:</b> <span style="color:green">Rs. ${netPay.toLocaleString()}</span>
+        </div>
     `;
 }
 
-// Logic for AI Expert using OpenRouter
 async function askAI(){
     const question = document.getElementById('aiQ').value;
     const resultDiv = document.getElementById('aiResult');
     const btn = document.getElementById('askBtn');
 
-    if(!question) return alert("Please type a question!");
+    if(!question) return alert("Hajurle kehi sodhnubhayeko chhaina!");
 
-    resultDiv.innerHTML = "<span class='loading'>🔄 Analyzing Nepal Tax Laws & Generating Entries...</span>";
+    resultDiv.innerHTML = "<b style='color:#e67e22'>🔄 Thinking (Nepal Tax Law 2082/83)...</b>";
     btn.disabled = true;
 
     try {
         const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
             headers: {
-                "Authorization": "Bearer YOUR_OPENROUTER_API_KEY", // <--- Afno API Key yaha hala
+                "Authorization": "Bearer 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",
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                "model": "google/gemini-2.0-flash-exp:free",
+                "model": "google/gemini-2.0-flash-lite-preview-02-05:free",
                 "messages": [
                     {
                         "role": "system",
-                        "content": `You are a professional Chartered Accountant (CA) of Nepal. 
-                        Your task is to provide Journal Entries, VAT calculations, and TDS advice strictly based on:
-                        1. **Income Tax Act, 2058** and **VAT Act, 2052**.
-                        2. **TDS Rates**: Service (VAT): 1.5%, Service (No VAT): 15%, Rent: 10%, Consultancy: 15%, Meeting Fee: 15%.
-                        3. **VAT**: 13%.
-                        4. **Journal Entry**: Provide in Dr/Cr table format with Narration.
-                        5. **Salary Tax**: Use current Nepal Tax Slabs (1% SST, etc.).
-                        6. **Language**: Use English with Roman Nepali explanations.`
+                        "content": "You are an expert Chartered Accountant of Nepal. Answer in Roman Nepali + English. For business transactions, ALWAYS provide a Journal Entry in a Markdown Table (Date, Particulars, L.F., Debit Rs., Credit Rs.). Use Nepal's Income Tax Act 2058 and VAT Act 2052. Current TDS: 1.5% for VAT service, 15% for non-VAT service, 10% for Rent. Be professional."
                     },
-                    {
-                        "role": "user",
-                        "content": question
-                    }
+                    { "role": "user", "content": question }
                 ]
             })
         });
 
         const data = await response.json();
-        if(data.choices && data.choices[0]) {
-            resultDiv.innerHTML = data.choices[0].message.content;
-        } else {
-            resultDiv.innerHTML = "Error: API Response issue. Check your Key.";
-        }
+        const content = data.choices[0].message.content;
+        
+        // Simple Markdown Table to HTML converter logic for display
+        resultDiv.innerHTML = formatAIResponse(content);
+
     } catch (error) {
-        resultDiv.innerHTML = "Error: System busy or Network issue. Please try again.";
+        resultDiv.innerHTML = "❌ Error: API Key expired or Connection lost.";
     } finally {
         btn.disabled = false;
     }
+}
+
+function formatAIResponse(text) {
+    // Basic formatting for the demo
+    return text.replace(/\n/g, "<br>").replace(/\|/g, "│");
 }
 </script>
 
